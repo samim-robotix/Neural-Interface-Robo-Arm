@@ -1,0 +1,187 @@
+Start time = 2012-02-15 11:40:32
+End time = 2012-02-15 11:42:12
+Valid connection - PASS - Test is a success.
+Get client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set valid client configuration - PASS - Test is a success.
+Set invalid client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set extreme client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set invalid string client configuration - PASS - Test is a success.
+Set null client configuration - PASS - Test is a success.
+Get protection zone list - PASS - Test is a success.
+Get active zone quantity - PASS - Test is a success.
+Set valid active zone quantity - PASS - Test is a success.
+Set valid active zone quantity - PASS - Test is a success.
+Set valid active zone quantity - PASS - Test is a success.
+Set a valid protection zone list - PASS - Test is a success.
+Set an invalid protection zone list - PASS - Test is a success.
+Serialize binary specific client configuration - PASS - Test is a success.
+Serialize binary specific protection zones profile - PASS - Test is a success.
+Serialize binary default control mapping charts - PASS - Test is a success.
+Deserialize binary specific client configuration - PASS - Test is a success.
+Deserialize binary specific protection zones - PASS - Test is a success.
+Deserialize binary specific control mapping charts - PASS - Test is a success.
+Get gripper information - PASS - Test is a success.
+Get sensors information - PASS - Test is a success.
+Get position cartesian info - PASS - Test is a success.
+Get position angular info - PASS - Test is a success.
+Get force cartesian info - PASS - Test is a success.
+Get force angular info - PASS - Test is a success.
+Get command cartesian info - PASS - Test is a success.
+Get command angular info - PASS - Test is a success.
+Get current angular info - PASS - Test is a success.
+Pass = 182
+Fail = 0
+Test done...

@@ -3,24 +3,25 @@
 ![Project Banner](assets/banner.png)
 
 [![Platform](https://img.shields.io/badge/Platform-ESP32-E7352C?logo=espressif&logoColor=white)](https://www.espressif.com/)
+[![Robotic Arm](https://img.shields.io/badge/Robotic%20Arm-Kinova%20JACO%206--DOF-00529B?logo=robotics&logoColor=white)](https://www.kinovarobotics.com/)
+[![Control Bridge](https://img.shields.io/badge/Host%20Bridge-C%23%20%2F%20.NET%208.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Framework](https://img.shields.io/badge/Framework-Arduino%20%2F%20PlatformIO-00979D?logo=arduino&logoColor=white)](https://platformio.org/)
-[![Language](https://img.shields.io/badge/Language-C%2B%2B-00599C?logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
 [![Hardware](https://img.shields.io/badge/Actuator-WS2812B%20NeoPixels-FF6F00)](https://www.adafruit.com/category/168)
-[![Protocol](https://img.shields.io/badge/Protocol-UART%20115200%20%7C%20WiFi%20SoftAP-008080)](https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter)
+[![Protocol](https://img.shields.io/badge/Protocol-UART%20115200%20%7C%20WiFi%20SoftAP%20%7C%20USB%202.0-008080)](https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 📌 Project Overview
 
-The **BCI Robotic Arm Visual Stimulator** is a high-precision embedded stimulation and telemetry engine engineered on the **Espressif ESP32** architecture. Designed specifically for **Brain-Computer Interface (BCI)** applications—such as neural-controlled robotic manipulators, assistive prosthetics, and neural spellers—this system generates strictly timed, frequency-accurate visual stimuli to evoke **Steady-State Visual Evoked Potentials (SSVEP)** and **P300 Event-Related Potentials** in user electroencephalography (EEG) brain signals.
+The **BCI Robotic Arm Visual Stimulator & Neural Interface System** is a closed-loop cyber-physical architecture connecting human electroencephalography (EEG) brain signals to a physical **Kinova JACO (Gen2) 6-DOF Assistive Robotic Manipulator**.
 
-In BCI-driven robotic systems, the visual stimulus serves as the crucial optical bridge: by focusing gaze on specific flickering targets representing robotic spatial coordinates (e.g., reaching directions, target grasp locations, or joint trajectories), the human occipital and parietal lobes generate phase- and frequency-locked brainwaves. An external host system processes these neural signals and commands the robotic arm to execute the intended spatial task.
+Engineered on the **Espressif ESP32** micro-architecture and **Kinova Gen2 Robotics API**, this system delivers strictly timed, microsecond-accurate optical stimuli to evoke **Steady-State Visual Evoked Potentials (SSVEP)** and **P300 Event-Related Potentials**. Decoded neural target intents are ingested by a host **C# / .NET 8** actuation bridge, which streams real-time Cartesian velocity vectors and joint trajectories to the Kinova robotic arm to execute spatial reaching, grasping, and placement tasks.
 
 ### 🌟 Why This Matters & Its Real-World Impact
-- **Assistive Independence**: Offers hands-free, motor-free control pathways for individuals with neuromuscular disorders (e.g., ALS, spinal cord injuries, quadriplegia).
-- **Sub-Millisecond Timing Stability**: Avoids the screen refresh rate jitter (e.g., standard 60 Hz display refresh limitations) by driving physical high-speed WS2812B LEDs directly via microsecond-level micro-controller hardware timers.
-- **Dual Operating Architectures**: Features both an automated high-throughput Serial UART telemetry system (with onboard EEPROM persistence) and a standalone wireless Wi-Fi Access Point web dashboard for rapid clinical calibration.
+- **Assistive Independence**: Empowers individuals with severe neuromuscular disorders (e.g., ALS, spinal cord injuries, quadriplegia) with a hands-free, motor-free pathway to interact with their physical environment.
+- **Sub-Millisecond Timing Stability**: Eliminates the 60 Hz display refresh rate jitter common to monitor-based visual stimuli by driving physical high-speed WS2812B LEDs directly via FreeRTOS microsecond timers.
+- **Closed-Loop Actuation & Diagnostics**: Combines high-frequency optical stimulation with bidirectional Kinova telemetry—monitoring live 6-axis joint torque ($N$), current ($A$), and power bus diagnostics ($V, W$) during spatial actuation.
 
 ---
 
@@ -42,10 +43,10 @@ In BCI-driven robotic systems, the visual stimulus serves as the crucial optical
 |      HOST PC & TELEMETRY      |                     |       HUMAN USER & EEG        |
 |  - Mode & Frequency Control   |                     |  - Visual Evoked Potentials   |
 |  - Real-Time Parameter Sync   |                     |    (SSVEP / P300 Response)    |
-|  - EEPROM Non-Volatile Memory |                     |  - 14/32/64-Channel EEG Cap   |
+|  - EEPROM Non-Volatile Memory |                     |  - Multi-Channel EEG Cap      |
 +---------------+---------------+                     +---------------+---------------+
                 |                                                     |
-                |                                                     | Microvolt Neural
+                | Parameter Calibration                               | Microvolt Neural
                 |                                                     | Signals
                 v                                                     v
 +-----------------------------------------------------------------------------------------+
@@ -60,15 +61,21 @@ In BCI-driven robotic systems, the visual stimulus serves as the crucial optical
 |        Classification Engine (Deep 1D-CNN / Transformer / LSTM / Linear Discriminant)   |
 +-----------------------------------------------------------------------------------------+
                                           |
-                                          | Decoded Target Intent
+                                          | Decoded Spatial Intent (Target 0 to 5)
                                           v
 +-----------------------------------------------------------------------------------------+
-|                                  3. ROBOTIC ACTUATION                                   |
+|                         3. KINOVA JACO ROBOTIC ACTUATION LAYER                          |
 |                                                                                         |
-|       +------------------------------------+    Forward / Inverse Kinematics            |
-|       | 6-DOF Robotic Arm Manipulator      | <------------------------------------+     |
-|       | Target Station Reaching & Grasping |                                            |
-|       +------------------------------------+                                            |
+|   +------------------------------------+      USB 2.0 (Kinova API)                      |
+|   | Host C# / .NET 8 Actuation Bridge  | --------------------------------+              |
+|   | - 50 Hz Cartesian Velocity Engine  |                                 |              |
+|   | - 6-Axis Dynamic Telemetry Logger  |                                 v              |
+|   +------------------------------------+              +-----------------------------+   |
+|                                                       | Kinova JACO 6-DOF Manipulator|   |
+|   +------------------------------------+              | - Integrated DSP Controller |   |
+|   | Real-Time Feedback Stream          | <----------- | - 6-Axis Current/Torque (N) |   |
+|   | - Supply V, Amps, Power (W), Force |              | - Assistive Arm + Gripper   |   |
+|   +------------------------------------+              +-----------------------------+   |
 +-----------------------------------------------------------------------------------------+
 ```
 
@@ -76,13 +83,20 @@ In BCI-driven robotic systems, the visual stimulus serves as the crucial optical
 
 ## ⚡ Core Technical Features
 
-- **Microsecond-Accurate Pulse Generation**: Implements a non-blocking FreeRTOS-friendly state machine via `millis()` ensuring precise duty cycles across frequencies ranging from **2.0 Hz to 20.0 Hz** (and up to **60 Hz** in Wi-Fi mode).
+### 💡 Embedded Optical Stimulator (ESP32 Firmware)
+- **Microsecond-Accurate Pulse Engine**: Non-blocking FreeRTOS state machine via `millis()` ensuring precise duty cycles across frequencies ranging from **2.0 Hz to 20.0 Hz** (and up to **60 Hz** in Wi-Fi mode).
 - **Dual Firmware Operating Paradigms**:
   1. **Spatial Multi-Station Firmware (`bci_led -3`)**: Controls **72 WS2812B LEDs** distributed across **6 distinct spatial target places** (12 LEDs per place). Supports sequential place flashing (Mode 1) and grouped column/row flashing (Mode 2) with automated rest cycles.
-  2. **Wireless Web-Controlled Matrix Firmware (`final code.txt`)**: Hosts a **Wi-Fi SoftAP** (`BCI_Stimulus_AP`) and serves a dark-themed responsive dashboard via `ESPAsyncWebServer` for direct dynamic adjustment of frequency, duty cycle, intervals, and RGB hex colors.
+  2. **Wireless Web-Controlled Matrix Firmware (`final code.txt`)**: Hosts a **Wi-Fi SoftAP** (`BCI_Stimulus_AP`) and serves a dark-themed responsive dashboard via `ESPAsyncWebServer` for dynamic tuning of frequency, duty cycle, intervals, and RGB colors.
 - **Robust UART Command Interface**: Supports full real-time bidirectional parameter orchestration over Serial at 115200 Baud (`FETCH`, `STARTM1`, `STARTM2`, `STOP`, `M1SEQ`, `M1`, `M2`).
-- **Non-Volatile Parameter Persistence**: Saves stimulation frequencies, durations, and RGB color profiles directly to ESP32 **EEPROM** (512 bytes) validated with a magic signature (`0xAABBCCDD`), surviving unexpected power cycles.
+- **Non-Volatile Parameter Persistence**: Saves calibrated frequencies, durations, and RGB color profiles directly to ESP32 **EEPROM** (512 bytes) validated with a magic signature (`0xAABBCCDD`), surviving unexpected power cycles.
 - **Visual Boot Diagnostics**: Built-in `showFlowingRadiant()` optical startup sequence verifies electrical continuity and LED channel health across all connected pixels before arming the stimulus.
+
+### 🦾 Kinova JACO 6-DOF Robotic Actuation & Telemetry (`Jaco/`)
+- **Real-Time 6-Axis Dynamics Streaming**: High-speed C# client (`jaco_test`) reading live per-joint current draw ($A$) and joint torque/force ($N$) across all 6 axes (`Joint #1` to `Joint #6`).
+- **Closed-Loop Cartesian Velocity Control**: 50 Hz (20 ms) update loop commanding smooth 3D linear translations ($X, Y, Z$) and wrist rotations via `CJoystickValue`.
+- **System Health & Bus Diagnostics**: Live monitoring of DSP firmware revisions, bus supply voltage ($V$), power consumption ($W$), and safety interlocks via `Kinova.API.Jaco.dll`.
+- **Target Station Navigation**: Automated mapping of BCI target selections to stored spatial waypoints for pick-and-place manipulation routines.
 
 ---
 
@@ -91,19 +105,20 @@ In BCI-driven robotic systems, the visual stimulus serves as the crucial optical
 ### Bill of Materials
 | Component | Specification / Model | Quantity | Purpose |
 | :--- | :--- | :---: | :--- |
+| **Robotic Arm** | Kinova JACO Gen2 (6-DOF + Gripper) | 1 | Physical manipulation and target reaching |
+| **Arm Power & Interface** | Kinova 24V DC Regulated Supply + USB 2.0 Cable | 1 | Powering arm actuators and host communication |
 | **Microcontroller** | ESP32-WROOM-32 / NodeMCU ESP-32S | 1 | Real-time stimulus timing, Serial parsing, Wi-Fi AP |
 | **Addressable LEDs** | WS2812B NeoPixel (Ring / Strip / Matrix) | 9 to 72 | Optical flicker targets for SSVEP/P300 elicitation |
-| **Power Supply** | 5V DC @ 2A – 3A Regulated | 1 | Powers ESP32 and high-draw NeoPixel LED arrays |
-| **Logic / Wiring** | 22 AWG hookup wire + 330Ω resistor | 1 Set | Power distribution & data line ringing protection |
-| **Capacitor** | 1000 µF, 6.3V or higher electrolytic | 1 | Decoupling capacitor across 5V and GND power rails |
+| **LED Power Supply** | 5V DC @ 2A – 3A Regulated | 1 | Independent power for high-draw NeoPixel arrays |
+| **Protection Circuitry** | 1000 µF capacitor + 330Ω resistor | 1 Set | Decoupling & data line ringing protection |
 | **Host Interface** | Micro-USB to USB-A Cable | 1 | 115200 Baud serial communication & firmware flashing |
 
-### Pinout Mapping
+### Pinout Mapping (ESP32)
 | ESP32 Pin | Connected Component | Function / Signal | Notes |
 | :--- | :--- | :--- | :--- |
 | **GPIO 4** | NeoPixel Strip / Matrix DIN | Data In (800 kHz signal) | Main PWM/RMT data transmission line |
-| **GND** | WS2812B GND & Power Supply GND | Common Ground | Essential to tie all grounds together |
-| **5V / VIN** | External 5V Power Supply (+5V) | System Power | For >12 LEDs, feed 5V externally to avoid brownouts |
+| **GND** | WS2812B GND & Supply GND | Common Ground | Essential to tie all system grounds together |
+| **5V / VIN** | External 5V Power Supply (+5V) | System Power | Feed 5V externally for arrays > 12 LEDs |
 | **GPIO 1 (TX0)** | Host PC / USB-UART | Serial Transmit | 115200 Baud telemetry & status feedback |
 | **GPIO 3 (RX0)** | Host PC / USB-UART | Serial Receive | 115200 Baud command ingestion |
 
@@ -124,14 +139,21 @@ BCI Robo arm/
 │           └── main.cpp            # 72-LED SSVEP stimulus state machine with EEPROM & UART parser
 ├── bci_led -2/                     # Incremental staging build for LED array
 ├── bci_led/                        # Baseline PlatformIO firmware build
+├── Jaco/                           # Kinova JACO Gen2 Robotics Control Suite
+│   ├── test_jaco/                  # Actuation bridge & telemetry source code
+│   │   ├── jaco_test/              # .NET 8 C# console telemetry & diagnostics client
+│   │   │   ├── Program.cs          # 6-axis joint torque/current & bus voltage monitor
+│   │   │   └── jaco_test.csproj    # .NET 8 project referencing Kinova API DLLs
+│   │   ├── CSharp/                 # WPF joystick emulation & Cartesian velocity controller
+│   │   └── CPlusPlus/              # Native C++/CLI API reference implementation
+│   ├── PS 0000 0009_1.5.1/         # Kinova Gen2 SDK v1.5.1 installers (Windows & Ubuntu)
+│   └── jaco/                       # Release archive (Jacosoft 3.2, DSP firmware, API docs)
 ├── New folder/                     # Curated academic research literature on BCI & Motor Imagery
 │   ├── BrainComputer_InterfaceA_Brain-in-the-Loop_Communication_System.pdf
 │   ├── MotorImageryClassificationUsingConvolutionalNeuralNetworks.pdf
 │   └── ... (12 specialized peer-reviewed papers)
 ├── final code.txt                  # Standalone ESP32 Wi-Fi AP + Async Web Server stimulus controller (C++)
-├── 20251209_162811.mp4             # High-resolution benchmark demonstration recording (Local)
-├── 20251209_163310.mp4             # High-resolution benchmark demonstration recording (Local)
-├── .gitignore                      # Configured to exclude build artifacts and large files
+├── .gitignore                      # Configured to exclude build artifacts, large binaries, and secrets
 └── README.md                       # Complete technical documentation
 ```
 
@@ -171,10 +193,29 @@ If using the Wi-Fi AP 3x3 matrix controller:
    - `ESPAsyncWebServer`
    - `AsyncTCP`
 3. Load the code from `final code.txt`, select board **ESP32 Dev Module**, and click **Upload**.
-4. On your PC or smartphone, connect to the Wi-Fi Access Point:
+4. Connect to the Wi-Fi Access Point:
    - **SSID**: `BCI_Stimulus_AP`
    - **Password**: `bci-password`
 5. Open your browser and navigate to `http://192.168.4.1` to access the interactive real-time stimulus dashboard.
+
+### 3. Kinova JACO Robotic Arm Setup (`Jaco/`)
+
+#### A. Driver & SDK Installation
+- **Windows**: Navigate to `Jaco/PS 0000 0009_1.5.1/PS 0000 0009_1.5.1/Windows/` and run `vc_redist_x86.exe` followed by `Kinova-Jaco-Usb-Driver-(usblib)-Installer.exe` and `SDK_GEN2_1_5_1_x86.exe`.
+- **Ubuntu Linux**: Navigate to `Jaco/PS 0000 0009_1.5.1/PS 0000 0009_1.5.1/Ubuntu/16_04/64 bits/` and execute:
+  ```bash
+  sudo ./installSDK64.sh
+  ```
+
+#### B. Launching the Telemetry & Control Bridge (.NET 8)
+1. Power on the Kinova JACO arm with its 24V DC supply and connect via USB 2.0.
+2. Navigate to the client directory and build the project:
+   ```bash
+   cd "Jaco/test_jaco/jaco_test"
+   dotnet build
+   dotnet run
+   ```
+3. The client will initialize `CJacoArm`, establish a hardware handshake, and stream live diagnostics, per-joint currents ($A$), and joint forces ($N$).
 
 ---
 
@@ -194,21 +235,14 @@ When connected over UART at **115200 Baud**, the firmware parses newline-termina
 
 ---
 
-## 📸 Media & Hardware Demonstration
+## 🎥 Media & Hardware Demonstration
 
-### Physical Hardware & Setup Showcase
-High-resolution photos showcasing the physical ESP32 wiring, custom optical diffuser mounts, and robotic arm workstation are located in `assets/photos/`:
-
-| Hardware Rig Front View | Target Cluster Array | Wiring & Controller Hub |
-| :---: | :---: | :---: |
-| ![Hardware Front](assets/photos/rig_front.png) | ![Target Array](assets/photos/target_array.png) | ![Wiring Hub](assets/photos/controller_hub.png) |
-*(Add photos to `assets/photos/` and update references above)*
-
-### Live Video Demonstrations
-Video recordings highlighting the frequency calibration and robotic arm coordination are cataloged in `assets/videos/`:
-- **Real-Time SSVEP Multi-Frequency Stimulus Calibration**: `assets/videos/stimulus_demo.mp4`
-- **BCI Closed-Loop Robotic Arm Target Reach Demonstration**: `assets/videos/bci_arm_reach.mp4`
-*(Local high-definition archive recordings `20251209_162811.mp4` and `20251209_163310.mp4` are preserved in your workspace).*
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/cc6c5d3d-c2b4-4c92-b100-55a25d3a45ce" width="100%" controls="controls">
+    Your browser does not support the video tag.
+  </video>
+  <p><em>Demonstration: BCI Visual Stimulation & Closed-Loop Kinova JACO Robotic Arm Target Acquisition</em></p>
+</div>
 
 ---
 
@@ -221,41 +255,6 @@ This project builds upon published research in motor imagery, wavelet-based feat
 
 ---
 
-## 🚀 Git Initialization & Publishing to GitHub
-
-Follow these sequential steps in PowerShell or your terminal to initialize Git, make your initial commit, and open the project directly in **GitHub Desktop**:
-
-```powershell
-# 1. Initialize local git repository
-git init
-
-# 2. Stage the files safely (respecting .gitignore which excludes large binaries and >100MB videos)
-git add .
-
-# 3. Create your initial production commit
-git commit -m "feat: initial commit of BCI robotic arm visual stimulator firmware and documentation"
-
-# 4. (Optional) Set default branch to main
-git branch -M main
-```
-
-### Opening in GitHub Desktop:
-1. Open **GitHub Desktop**.
-2. Click **File** > **Add Local Repository...** (or press `Ctrl + O`).
-3. Browse and select `c:\Users\Samim Akhtar\Desktop\BCI Robo arm`.
-4. Click **Add Repository**.
-5. Click **Publish repository** to create and sync your private or public repository directly on your GitHub profile.
-
----
-
 ## 📜 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-
-
-https://github.com/user-attachments/assets/cc6c5d3d-c2b4-4c92-b100-55a25d3a45ce
-
-
-
-
