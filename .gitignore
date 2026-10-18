@@ -1,0 +1,63 @@
+# ==============================================================================
+# Git Ignore Configuration for BCI Robotic Arm Visual Stimulus & Firmware
+# ==============================================================================
+
+# PlatformIO & Embedded Build Artifacts
+.pio/
+**/.pio/
+*.pio
+.pioenvs/
+.piolibdeps/
+
+# Microcontroller Compilation Binaries & Objects
+*.hex
+*.bin
+*.elf
+*.o
+*.d
+*.obj
+*.a
+*.lib
+
+# IDE & Editor Files
+.vscode/
+**/.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python Virtual Environments & Cache (for Host EEG/CV pipelines)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Large Archives & Compressed Backups
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Large Media Files (Files > 100 MB cannot be pushed directly to GitHub)
+# Keep raw heavy smartphone/bench recordings local or track via Git LFS
+*.mp4
+*.mov
+*.avi
+*.mkv
+# Allow compressed web-friendly demo video embeds in assets/videos if added
+!assets/videos/*.mp4
+!assets/videos/*.webm

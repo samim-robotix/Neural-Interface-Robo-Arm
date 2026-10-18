@@ -1,0 +1,240 @@
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <Adafruit_NeoPixel.h>
+
+// --- Wi-Fi Hotspot (Access Point) Configuration ---
+const char* hotspot_ssid = "BCI_Stimulus_AP";
+const char* hotspot_password = "bci-password";
+
+// --- NeoPixel Configuration ---
+#define LED_PIN   4
+#define LED_COUNT 9
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// --- Create AsyncWebServer object on port 80 ---
+AsyncWebServer server(80);
+
+// --- Global Control Variables ---
+bool isRunning = false;
+uint32_t flickerColor = strip.Color(255, 0, 0);
+int flickerHz = 12;
+int flickerDurationMs = 4000;
+int intervalMs = 2000;
+
+// --- Animation State Machine Variables ---
+int currentStep = 0;
+enum State { WAITING, FLICKERING };
+State currentState = WAITING;
+unsigned long lastStateChangeTime = 0;
+unsigned long lastFlickerToggleTime = 0;
+bool isLedOn = false;
+
+// --- LED Group Definitions ---
+const int row1[] = {0, 1, 2}, row2[] = {5, 4, 3}, row3[] = {6, 7, 8};
+const int col1[] = {0, 5, 6}, col2[] = {1, 4, 7}, col3[] = {2, 3, 8};
+const int* groups[] = {row1, row2, row3, col1, col2, col3};
+
+// --- HTML content for the webpage (stored in program memory) ---
+const char HTML_CONTENT[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCI Stimulus Controller</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        :root {
+            --bg-color: #1a1a2e; --card-color: #16213e; --primary-color: #0f3460;
+            --accent-color: #e94560; --text-color: #e0e0e0; --label-color: #a0a0c0;
+            --border-radius: 12px; --shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        body {
+            font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            margin: 0; padding: 20px; box-sizing: border-box;
+        }
+        .container {
+            width: 100%; max-width: 450px; background-color: var(--card-color);
+            border-radius: var(--border-radius); padding: 30px; box-shadow: var(--shadow);
+            border: 1px solid var(--primary-color);
+        }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: var(--text-color); margin: 0; font-weight: 600; }
+        header p { color: var(--label-color); margin: 5px 0 0; }
+        .control-group { margin-bottom: 25px; }
+        .control-group label { display: block; color: var(--label-color); margin-bottom: 8px; font-weight: 300; }
+        .control-row { display: flex; align-items: center; gap: 15px; }
+        input[type="color"], input[type="range"] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; }
+        input[type="range"] {
+            width: 100%; height: 8px; background: var(--primary-color); border-radius: 5px; outline: none; transition: opacity 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 20px; height: 20px; background: var(--accent-color);
+            border-radius: 50%; border: 3px solid var(--card-color); box-shadow: 0 0 5px rgba(233, 69, 96, 0.5);
+        }
+        input[type="color"] { width: 45px; height: 45px; border: none; border-radius: 8px; padding: 0; background-color: transparent; }
+        input[type="color"]::-webkit-color-swatch { border-radius: 8px; border: 2px solid var(--primary-color); }
+        .value-display { font-weight: 400; min-width: 60px; text-align: right; color: var(--text-color); }
+        .actions { margin-top: 30px; }
+        #toggleButton {
+            width: 100%; padding: 15px; font-size: 16px; font-weight: 600; border: none;
+            border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s ease; color: #fff;
+        }
+        #toggleButton.start { background: linear-gradient(45deg, #3498db, #2980b9); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); }
+        #toggleButton.stop { background: linear-gradient(45deg, var(--accent-color), #c0392b); box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4); }
+        #toggleButton:hover { transform: translateY(-2px); }
+        fieldset { border: none; padding: 0; margin: 0; transition: opacity 0.3s; }
+        fieldset:disabled { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BCI Visual Stimulus</h1> <p>Real-time P300/SSVEP Controller</p>
+        </header>
+        <main>
+            <fieldset id="controls">
+                <div class="control-group"> <label for="color">Stimulus Color</label> <div class="control-row"> <input type="color" id="color" value="#ff0000"> </div> </div>
+                <div class="control-group"> <label for="hz">Flicker Frequency</label> <div class="control-row"> <input type="range" id="hz" min="1" max="60" value="12" step="1"> <span class="value-display"><span id="hz-value">12</span> Hz</span> </div> </div>
+                <div class="control-group"> <label for="duration">Flicker Duration</label> <div class="control-row"> <input type="range" id="duration" min="0.5" max="10" value="4.0" step="0.1"> <span class="value-display"><span id="duration-value">4.0</span> s</span> </div> </div>
+                <div class="control-group"> <label for="interval">Interval Delay</label> <div class="control-row"> <input type="range" id="interval" min="0.5" max="10" value="2.0" step="0.1"> <span class="value-display"><span id="interval-value">2.0</span> s</span> </div> </div>
+            </fieldset>
+            <div class="actions"> <button id="toggleButton" class="start">Start Stimulus</button> </div>
+        </main>
+    </div>
+    <script>
+        const controls = document.getElementById('controls'); const toggleButton = document.getElementById('toggleButton');
+        const colorInput = document.getElementById('color'); const hzInput = document.getElementById('hz');
+        const hzValue = document.getElementById('hz-value'); const durationInput = document.getElementById('duration');
+        const durationValue = document.getElementById('duration-value'); const intervalInput = document.getElementById('interval');
+        const intervalValue = document.getElementById('interval-value'); let isRunning = false;
+        function updateSliderValue(input, display) { display.textContent = parseFloat(input.value).toFixed(1); }
+        hzInput.addEventListener('input', () => { hzValue.textContent = hzInput.value; });
+        durationInput.addEventListener('input', () => { updateSliderValue(durationInput, durationValue); });
+        intervalInput.addEventListener('input', () => { updateSliderValue(intervalInput, intervalValue); });
+        function sendUpdate() {
+            if (isRunning) return;
+            const params = `?color=${colorInput.value}&hz=${hzInput.value}&duration=${durationInput.value}&interval=${intervalInput.value}`;
+            fetch(`/update${params}`).then(res => console.log('Update sent'));
+        }
+        document.querySelectorAll('input').forEach(input => { input.addEventListener('change', sendUpdate); });
+        toggleButton.addEventListener('click', () => {
+            isRunning = !isRunning; fetch('/toggle').then(res => console.log('Toggle sent')); updateUI();
+        });
+        function updateUI() {
+            if (isRunning) {
+                toggleButton.textContent = 'Stop Stimulus'; toggleButton.classList.remove('start');
+                toggleButton.classList.add('stop'); controls.disabled = true;
+            } else {
+                toggleButton.textContent = 'Start Stimulus'; toggleButton.classList.remove('stop');
+                toggleButton.classList.add('start'); controls.disabled = false;
+            }
+        }
+        updateUI();
+    </script>
+</body>
+</html>
+)rawliteral";
+
+// ================================================================
+//                         SETUP
+// ================================================================
+void setup() {
+  Serial.begin(115200);
+
+  // --- Initialize NeoPixels ---
+  strip.begin();
+  strip.setBrightness(255);
+  strip.clear();
+  strip.show();
+
+  // --- Start Wi-Fi Access Point ---
+  Serial.print("Creating Access Point: ");
+  Serial.println(hotspot_ssid);
+  WiFi.softAP(hotspot_ssid, hotspot_password);
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(IP);
+
+  // --- Define Web Server Routes ---
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    Serial.println(" -> Request: / (Serving HTML page)");
+    request->send_P(200, "text/html", HTML_CONTENT);
+  });
+
+  server.on("/toggle", HTTP_GET, [](AsyncWebServerRequest *request){
+    isRunning = !isRunning;
+    Serial.printf(" -> Request: /toggle. Stimulus is now %s\n", isRunning ? "ON" : "OFF");
+    currentStep = 0;
+    lastStateChangeTime = millis();
+    currentState = WAITING;
+    strip.clear(); strip.show();
+    request->send(200, "text/plain", "Toggled");
+  });
+
+  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (isRunning) {
+      Serial.println(" -> Request: /update (Denied: Stimulus is running)");
+      request->send(403, "text/plain", "Stop stimulus to update parameters");
+      return;
+    }
+    Serial.println(" -> Request: /update (Updating parameters)");
+    if (request->hasParam("color")) {
+      String hex = request->getParam("color")->value();
+      hex.replace("#", "");
+      long number = strtol(hex.c_str(), NULL, 16);
+      flickerColor = strip.Color((number >> 16) & 0xFF, (number >> 8) & 0xFF, number & 0xFF);
+    }
+    if (request->hasParam("hz")) flickerHz = request->getParam("hz")->value().toInt();
+    if (request->hasParam("duration")) flickerDurationMs = request->getParam("duration")->value().toFloat() * 1000;
+    if (request->hasParam("interval")) intervalMs = request->getParam("interval")->value().toFloat() * 1000;
+
+    Serial.printf("    New Params: %d Hz, %dms duration, %dms interval\n", flickerHz, flickerDurationMs, intervalMs);
+    request->send(200, "text/plain", "Updated");
+  });
+  
+  // --- Start server ---
+  server.begin();
+}
+
+// ================================================================
+//                     MAIN LOOP
+// ================================================================
+void loop() {
+  // The server runs in the background. The loop is only for the animation.
+  runAnimation();
+  // We add a tiny delay to be friendly to the FreeRTOS scheduler
+  delay(1);
+}
+
+// ================================================================
+//                    ANIMATION LOGIC
+// ================================================================
+void runAnimation() {
+  if (!isRunning) {
+    strip.clear(); strip.show(); currentStep = 0; currentState = WAITING; return;
+  }
+  unsigned long currentTime = millis();
+  if (currentState == WAITING) {
+    if (currentTime - lastStateChangeTime >= intervalMs) {
+      currentState = FLICKERING; lastStateChangeTime = currentTime;
+    }
+  } else if (currentState == FLICKERING) {
+    if (currentTime - lastStateChangeTime >= flickerDurationMs) {
+      currentStep = (currentStep + 1) % 6;
+      currentState = WAITING; lastStateChangeTime = currentTime;
+      strip.clear(); strip.show();
+    } else {
+      int flickerDelay = (flickerHz > 0) ? (1000 / (flickerHz * 2)) : 1000;
+      if (currentTime - lastFlickerToggleTime >= flickerDelay) {
+        lastFlickerToggleTime = currentTime; isLedOn = !isLedOn;
+        const int* currentGroup = groups[currentStep];
+        uint32_t color = isLedOn ? flickerColor : 0;
+        for (int i = 0; i < 3; i++) strip.setPixelColor(currentGroup[i], color);
+        strip.show();
+      }
+    }
+  }
+}
